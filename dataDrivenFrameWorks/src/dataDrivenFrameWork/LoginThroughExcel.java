@@ -1,5 +1,9 @@
 package dataDrivenFrameWork;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -9,24 +13,50 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-public class BothCorrect {
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.read.biff.BiffException;
+
+public class LoginThroughExcel {
+	
+	String[][] data=null;
 	WebDriver driver;
 	
-	String [][] data= {
-			
-			{"Admin","admin123"},
-			{"Admin","admin1232"},
-			{"Adminn","admin123"},
-			{"Adminn","admin1234"}
-			
-	};
 	
 	@DataProvider(name="logindata")
-	private String[][] loginDataProvider() {
+	public String[][] loginWithDataProvider() throws BiffException, IOException {
+		
+		data=getExcelData();
 		
 		return data;
+		
 	}
+	
 
+	public String[][] getExcelData() throws BiffException, IOException{
+		
+		FileInputStream fileInputStream = new FileInputStream("C:\\Users\\admin\\Desktop\\Login-Data.xls");
+		
+		Workbook workbook= Workbook.getWorkbook(fileInputStream);
+		Sheet sheet= workbook.getSheet(0);
+		
+		int rowCount=sheet.getRows();
+		int columnCount = sheet.getColumns();
+		
+		String testData[][]= new String[rowCount-1][columnCount];
+		
+		for(int i=1;i<rowCount;i++) {
+			for(int j=0;j<columnCount;j++) {
+				testData[i-1][j]=sheet.getCell(j, i).getContents();
+				
+			}
+			
+		}
+		return testData;
+		
+	}
+	
+	
 	@BeforeSuite
 	public void BeforeTest() {
 		
@@ -58,6 +88,6 @@ public class BothCorrect {
 		driver.quit();
 	}
 
+		
 
-	
 }
